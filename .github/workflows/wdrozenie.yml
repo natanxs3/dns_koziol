@@ -1,0 +1,78 @@
+name: DNS - wdrozenie istniejacego obrazu
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Unikalny tag istniejacego obrazu (bNUMER-SHA)
+        required: true
+        type: string
+      srodowisko:
+        description: Srodowisko docelowe
+        required: true
+        type: choice
+        options: [Testowe, Produkcyjne]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  sprawdzenie:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    outputs:
+      run-id: ${{ steps.dowod.outputs.run-id }}
+    steps:
+      - name: Czy obraz istnieje
+        env:
+          TAG: ${{ inputs.tag }}
+          LOGIN: ${{ vars.DOCKERHUB_USERNAME }}
+        run: |
+          [[ "$TAG" =~ ^b[0-9]+-[a-f0-9]{7}$ ]] || exit 1
+          docker manifest inspect "$LOGIN/dns_koziol:$TAG" >/dev/null
+      - name: Dowod udanego testu TEST przed promocja na PROD
+        id: dowod
+        if: inputs.srodowisko == 'Produkcyjne'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          run_id=$(gh api --paginate "repos/$GH_REPO/actions/artifacts" --jq ".artifacts[] | select(.name == \"tested-$TAG\" and .expired == false) | .workflow_run.id" | head -n 1)
+          [[ "$run_id" =~ ^[0-9]+$ ]] || { echo 'Brak artefaktu potwierdzajacego udany test tego obrazu na TEST.'; exit 1; }
+          echo "run-id=$run_id" >> "$GITHUB_OUTPUT"
+          echo "Obraz przeszedl test TEST w przebiegu: https://github.com/$GH_REPO/actions/runs/$run_id"
+  wdrozenie:
+    needs: sprawdzenie
+    runs-on: [self-hosted, Linux, X64, '${{ inputs.srodowisko == ''Testowe'' && ''test_koziol'' || ''prod_koziol'' }}']
+    environment: ${{ inputs.srodowisko }}
+    concurrency:
+      group: dns-${{ inputs.srodowisko }}
+      cancel-in-progress: false
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        if: inputs.srodowisko == 'Produkcyjne'
+        with:
+          name: tested-${{ inputs.tag }}
+          run-id: ${{ needs.sprawdzenie.outputs.run-id }}
+          github-token: ${{ github.token }}
+          path: dowod-promocji
+      - name: Potwierdzenie zgodnosci tagu
+        if: inputs.srodowisko == 'Produkcyjne'
+        env:
+          TAG: ${{ inputs.tag }}
+        run: test "$(cat dowod-promocji/tag.txt)" = "$TAG"
+      - name: Wdrozenie bez ponownego budowania oraz testy
+        env:
+          OBRAZ: ${{ vars.DOCKERHUB_USERNAME }}/dns_koziol
+          TAG: ${{ inputs.tag }}
+          DNS_SERVER_IP: ${{ vars.DNS_SERVER_IP }}
+        run: bash .github/scripts/deploy_dns.sh
+      - uses: actions/upload-artifact@v4
+        if: inputs.srodowisko == 'Testowe'
+        with:
+          name: tested-${{ inputs.tag }}
+          path: dowod-testu/
+          retention-days: 90
