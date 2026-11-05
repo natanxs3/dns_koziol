@@ -40,7 +40,7 @@ jobs:
           STREFA: ${{ matrix.strefa }}
           PLIK: ${{ matrix.plik }}
         run: |
-          mkdir -p "$RUNNER_TEMP/root/etc/bind"
+          mkdir -p "$RUNNER_TEMP/root/etc/bind" "$RUNNER_TEMP/root/var/cache/bind"
           cp bind-config/* "$RUNNER_TEMP/root/etc/bind/"
           sudo named-checkconf -t "$RUNNER_TEMP/root" /etc/bind/named.conf
           named-checkzone "$STREFA" "$PLIK"
