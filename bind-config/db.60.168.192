@@ -1,0 +1,19 @@
+; Strefa odwrotna 60.168.192.in-addr.arpa (sieć 192.168.60.0/24)
+;
+; UWAGA: przy KAŻDEJ zmianie tego pliku należy zwiększyć numer seryjny (Serial)!
+$TTL 300
+@   IN  SOA ns1.koziol.lan. admin.koziol.lan. (
+            2026110501 ; Serial
+            3600       ; Refresh
+            600        ; Retry
+            604800     ; Expire
+            60 )       ; Negative Cache TTL
+;
+@                   IN  NS      ns1.koziol.lan.
+;
+; Ostatni oktet adresu IP -> nazwa hosta
+11	IN  PTR     jenkins.koziol.lan.
+12	IN  PTR     agent.koziol.lan.
+13	IN  PTR     test.koziol.lan.
+14	IN  PTR     prod.koziol.lan.
+15	IN  PTR     agh.koziol.lan.

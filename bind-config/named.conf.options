@@ -1,0 +1,16 @@
+options {
+    directory "/var/cache/bind";
+
+    // Serwer autorytatywny - odpowiada wyłącznie na zapytania o własne strefy.
+    // Rozwiązywaniem nazw publicznych (rekurencją) dla klientów zajmuje się AdGuard Home,
+    // który zapytania o strefę wewnętrzną przekazuje do tego serwera.
+    recursion no;
+    allow-query { any; };
+    allow-transfer { none; };
+
+    listen-on port 53 { any; };
+    listen-on-v6 { none; };
+
+    // Nie ujawniamy wersji BIND w odpowiedzi na zapytanie version.bind
+    version "niedostepna";
+};

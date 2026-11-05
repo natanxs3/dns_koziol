@@ -1,0 +1,2 @@
+# Wymuszenie końców linii LF - pliki konfiguracyjne BIND trafiają do obrazu Linux.
+* text=auto eol=lf

@@ -1,0 +1,32 @@
+; Strefa wewnętrzna koziol.lan firmy KoziołNet
+;
+; UWAGA: przy KAŻDEJ zmianie tego pliku należy zwiększyć numer seryjny (Serial)!
+;        Format: RRRRMMDDNN - data zmiany i numer zmiany w danym dniu,
+;        np. 2026100301 -> 2026100302 (druga zmiana tego samego dnia).
+;
+; Krótkie czasy TTL (300 s) oraz pamięci podręcznej odpowiedzi negatywnych (60 s) są celowe:
+; zmiany rekordów szybko stają się widoczne także dla klientów korzystających z AdGuard Home,
+; który przechowuje odpowiedzi w swojej pamięci podręcznej.
+$TTL 300
+@   IN  SOA ns1.koziol.lan. admin.koziol.lan. (
+            2026110501 ; Serial
+            3600       ; Refresh
+            600        ; Retry
+            604800     ; Expire
+            60 )       ; Negative Cache TTL
+;
+@           IN  NS      ns1.koziol.lan.
+;
+; Serwer DNS (produkcyjny)
+ns1         IN  A       192.168.60.14
+;
+; Serwery platformy
+jenkins     IN  A       192.168.60.11
+agent       IN  A       192.168.60.12
+test        IN  A       192.168.60.13
+prod        IN  A       192.168.60.14
+agh         IN  A       192.168.60.15
+;
+; Portal firmowy
+www         IN  A       192.168.60.14
+www-test    IN  A       192.168.60.13

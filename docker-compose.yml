@@ -1,0 +1,18 @@
+# Uruchomienie serwera DNS na serwerze TEST lub PROD.
+#
+# Nazwa i tag obrazu NIE są wpisane na stałe - przekazuje się je zmiennymi środowiskowymi
+# (w przepływie GitHub Actions ustawianymi np. w sekcji env zadania wdrożeniowego):
+#   OBRAZ - nazwa obrazu w Docker Hub, np. login_docker_hub/dns_koziol
+#   TAG   - unikalny, niezmienny tag przetestowanego budowania, np. b57-1a2b3c4
+#           (numer przebiegu przepływu i skrót commita) - nigdy latest
+#
+# Przykład uruchomienia ręcznego:
+#   OBRAZ=login_docker_hub/dns_koziol TAG=b57-1a2b3c4 docker compose up -d
+services:
+  dns:
+    image: "${OBRAZ:?Ustaw zmienna OBRAZ}:${TAG:?Ustaw zmienna TAG}"
+    container_name: serwer-dns
+    ports:
+      - "53:53/udp"
+      - "53:53/tcp"
+    restart: unless-stopped

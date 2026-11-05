@@ -1,0 +1,11 @@
+// Strefa wewnętrzna firmy
+zone "koziol.lan" {
+    type primary;
+    file "/etc/bind/db.koziol.lan";
+};
+
+// Strefa odwrotna (rekordy PTR) dla sieci laboratoryjnej 192.168.60.0/24
+zone "60.168.192.in-addr.arpa" {
+    type primary;
+    file "/etc/bind/db.60.168.192";
+};
