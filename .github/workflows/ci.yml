@@ -1,0 +1,59 @@
+name: DNS CI
+on:
+  push:
+    branches: ['**']
+    tags: ['v*.*.*']
+    paths:
+      - 'bind-config/**'
+      - 'Dockerfile'
+      - '.dockerignore'
+      - 'docker-compose.yml'
+      - '.github/**'
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '17 3 * * 1'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  strefy:
+    name: Strefa ${{ matrix.strefa }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - strefa: koziol.lan
+            plik: bind-config/db.koziol.lan
+          - strefa: 60.168.192.in-addr.arpa
+            plik: bind-config/db.60.168.192
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Narzedzia BIND
+        run: sudo apt-get update -qq && sudo apt-get install -y bind9-utils
+      - name: Skladnia konfiguracji i strefy
+        env:
+          STREFA: ${{ matrix.strefa }}
+          PLIK: ${{ matrix.plik }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/root/etc/bind"
+          cp bind-config/* "$RUNNER_TEMP/root/etc/bind/"
+          sudo named-checkconf -t "$RUNNER_TEMP/root" /etc/bind/named.conf
+          named-checkzone "$STREFA" "$PLIK"
+      - name: Kontrola wzrostu numeru SOA
+        env:
+          PLIK: ${{ matrix.plik }}
+        run: python3 .github/scripts/soa.py "$PLIK"
+  dockerfile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
