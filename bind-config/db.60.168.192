@@ -3,7 +3,7 @@
 ; UWAGA: przy KAŻDEJ zmianie tego pliku należy zwiększyć numer seryjny (Serial)!
 $TTL 300
 @   IN  SOA ns1.koziol.lan. admin.koziol.lan. (
-            2026110501 ; Serial
+            2026110601 ; Serial
             3600       ; Refresh
             600        ; Retry
             604800     ; Expire
@@ -17,3 +17,4 @@ $TTL 300
 13	IN  PTR     test.koziol.lan.
 14	IN  PTR     prod.koziol.lan.
 15	IN  PTR     agh.koziol.lan.
+16      IN  PTR     gitlab.koziol.lan.
