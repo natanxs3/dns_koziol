@@ -34,5 +34,5 @@ www-test    IN  A       192.168.60.13
 gitlab      IN  A       192.168.60.16
 portal      IN  A       192.168.60.14
 
-; E3-1 kontrolowany blad skladni
-awaria IN A niepoprawny-adres
+; E3-2 poprawna skladnia, brak zwiekszenia SOA
+proba-soa IN A 192.168.60.14
