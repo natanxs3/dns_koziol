@@ -9,7 +9,7 @@
 ; który przechowuje odpowiedzi w swojej pamięci podręcznej.
 $TTL 300
 @   IN  SOA ns1.koziol.lan. admin.koziol.lan. (
-            2026110702 ; Serial
+            2026110703 ; Serial
             3600       ; Refresh
             600        ; Retry
             604800     ; Expire
@@ -33,6 +33,3 @@ www-test    IN  A       192.168.60.13
 
 gitlab      IN  A       192.168.60.16
 portal      IN  A       192.168.60.14
-
-; E3-2 poprawna skladnia, brak zwiekszenia SOA
-proba-soa IN A 192.168.60.14
