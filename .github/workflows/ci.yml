@@ -13,8 +13,8 @@ on:
     branches: [main]
   schedule:
     - cron: '17 3 * * 1'
-    # Tymczasowy termin weryfikacji rzeczywistego zdarzenia schedule, 7 listopada 2026 UTC.
-    - cron: '7 19 7 11 *'
+    # Tymczasowa czestotliwosc na czas weryfikacji zdarzenia schedule; po tescie usunac.
+    - cron: '*/5 * * * *'
 permissions:
   contents: read
 jobs:
